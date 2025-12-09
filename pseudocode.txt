@@ -1,0 +1,58 @@
+INPUT phase
+phase=lowercase(phase)
+
+IF phase = "bpl" THEN
+    INPUT watts
+    INPUT units
+
+    IF watts <= 1000 AND units <= 40 THEN
+        fixed_charge = 0
+        total_charge = units * 1.50
+        total = fixed_charge + total_charge
+        PRINT BPL bill details
+        STOP
+    ELSE
+        PRINT "Not BPL, billing as single"
+        phase = "single"
+    ENDIF
+ENDIF
+
+INPUT units
+
+IF phase = "single" THEN
+    SELECT fixed_charge BASED ON unit slabs
+ELSE
+    SELECT fixed_charge FOR three phase slabs
+ENDIF
+
+IF units <= 250 THEN
+    type = "telescopic"
+ELSE
+    type = "non-telescopic"
+ENDIF
+
+charge = 0
+
+IF type = "telescopic" THEN
+    bal = units
+
+    slab = MIN(bal, 50)
+    charge = charge + slab * 3.15
+    bal = bal - slab
+
+    REPEAT ABOVE LOGIC FOR
+        3.70
+        4.80
+        6.40
+        7.60
+UNTIL bal = 0
+
+ELSE
+    SELECT rate BASED ON unit range
+    charge = units * rate
+ENDIF
+
+total = fixed_charge + charge
+
+PRINT all bill details
+END
