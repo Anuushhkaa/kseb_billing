@@ -1,0 +1,49 @@
+step1: START
+
+step2: Read phase-single,three,bpl
+
+step3:If phase = bpl
+a. read watts
+b. read units
+c. If watts ≤ 1000 AND units ≤ 40
+
+fixed_charge = 0
+
+total_charge = units × 1.50
+total=fixed_charge+total_charge
+
+Print BPL Bill details
+
+Stop
+d. Else
+
+Print “Not BPL, billing as single”
+
+Set phase = single
+step4:Read units
+
+step5:Determine fixed charge
+
+a.if phase=single,asign fixed charge according to unit range
+b.else(three phase),assign fixed charge using three phase slab
+
+step6:bill type
+
+a.if unit<=250,type=telescopic
+b.else,type=non-telescopic
+
+step7:if telescopic 
+
+a.apply slabs of 50units one by one
+b.multiply slab units*respective rate
+
+step 8:else
+
+a.select rate based on unit range
+b.charge=units*rate
+
+step9:total=fixed_charge+charge
+
+step10:print the bill
+
+step11: STOP
