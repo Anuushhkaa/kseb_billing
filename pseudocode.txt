@@ -1,58 +1,78 @@
-INPUT phase
-phase=lowercase(phase)
+BEGIN
+
+PRINT "KSEB ELECTRICITY BILL SYSTEM"
+
+READ consumer_name
+READ phase
+READ units
+
+SET energy_charge = 0
+SET fixed_charge =0
+SET is_bpl_success = FALSE
 
 IF phase = "bpl" THEN
-    INPUT watts
-    INPUT units
+    READ watts
 
-    IF watts <= 1000 AND units <= 40 THEN
-        fixed_charge = 0
-        total_charge = units * 1.50
-        total = fixed_charge + total_charge
-        PRINT BPL bill details
-        STOP
+    IF watts ≤ 1000 AND units <= 40 THEN
+        energy_charge = units × 1.50
+        fixed_charge =0
+        duty = 0
+        fuel_surcharge = 0
+        meter_rent = 0
+        total = energy_charge
+        is_bpl_success = TRUE
+
+        PRINT "KSEB BILL (BPL SUBSIDY)"
+        PRINT consumer_name
+        PRINT units
+        PRINT energy_charge
+        PRINT total
     ELSE
-        PRINT "Not BPL, billing as single"
+        PRINT "Not eligible for BPL subsidy"
         phase = "single"
     ENDIF
 ENDIF
 
-INPUT units
+IF is_bpl_success = FALSE THEN
 
-IF phase = "single" THEN
-    SELECT fixed_charge BASED ON unit slabs
-ELSE
-    SELECT fixed_charge FOR three phase slabs
+    IF phase = "single" THEN
+        fixed_charge = 260
+    ELSE IF phase = "three" THEN
+        fixed_charge = 520
+    ELSE
+        PRINT "Invalid phase"
+        STOP
+    ENDIF
+
+    IF units <= 50 THEN
+        energy_charge =units × 3.15
+    ELSE IF units <= 100 THEN
+        energy_charge = (50 × 3.15) + ((units − 50) × 3.70)
+    ELSE IF units <= 150 THEN
+        energy_charge = (50 × 3.15) + (50 × 3.70) + ((units − 100) × 4.80)
+    ELSE
+        energy_charge = (50 × 3.15) + (50 × 3.70) + (50 × 4.80) + ((units − 150) × 6.40)
+    ENDIF
+
+    duty = 10% of energy_charge
+    fuel_surcharge = units × 0.10
+    meter_rent = 30
+
+    total = energy_charge + fixed_charge + duty + fuel_surcharge + meter_rent
+    payable = ROUND(total)
+
+    PRINT "KSEB ELECTRICITY BILL"
+    PRINT consumer_name
+    PRINT phase
+    PRINT units
+    PRINT energy_charge
+    PRINT fixed_charge
+    PRINT duty
+    PRINT fuel_surcharge
+    PRINT meter_rent
+    PRINT payable
+
 ENDIF
 
-IF units <= 250 THEN
-    type = "telescopic"
-ELSE
-    type = "non-telescopic"
-ENDIF
-
-charge = 0
-
-IF type = "telescopic" THEN
-    bal = units
-
-    slab = MIN(bal, 50)
-    charge = charge + slab * 3.15
-    bal = bal - slab
-
-    REPEAT ABOVE LOGIC FOR
-        3.70
-        4.80
-        6.40
-        7.60
-UNTIL bal = 0
-
-ELSE
-    SELECT rate BASED ON unit range
-    charge = units * rate
-ENDIF
-
-total = fixed_charge + charge
-
-PRINT all bill details
 END
+
