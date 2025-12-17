@@ -1,49 +1,37 @@
 step1: START
 
-step2: Read phase-single,three,bpl
+step2: Read Consumer Name, Phase (single/three/bpl), and Units
 
-step3:If phase = bpl
-a. read watts
-b. read units
-c. If watts ≤ 1000 AND units ≤ 40
+step3:If phase = "bpl":
+a.Read Watts
+b.If Watts <= 1000 AND Units <=40:
+Set Fixed_Charge = 0, Energy_Charge = Units*1.50
+Total = Energy_Charge
+Print BPL Bill and STOP
+c.Else:
+Print "Not eligible for BPL, switching to Single Phase..."
+Set phase = "single" and proceed to Step 4
 
-fixed_charge = 0
+step4:Determine Fixed Charge:
 
-total_charge = units × 1.50
-total=fixed_charge+total_charge
+a. If phase = "single": Fixed_Charge = 260
 
-Print BPL Bill details
+b. If phase = "three": Fixed_Charge = 520
 
-Stop
-d. Else
+step5:Calculate Energy Charge 
+a. Slab 1 (0-50): Charge = Units*3.15
+b. Slab 2 (51-100):Charge = (50*3.15) + ((Units - 50)*3.70)
+c. Slab 3 (101-150):Charge = (50*3.15) + (50*3.70) + ((Units - 100)*4.80)
+d. Slab 4 (>150):Charge = (50*3.15)+(50*3.70)+(50*4.80)+((Units - 150)*6.40)
 
-Print “Not BPL, billing as single”
+step6: Add Statutory Charges:
+a.Duty: Energy_Charge*10%
+b.Fuel Surcharge: Units*0.10
+c.Meter Rent: 30
 
-Set phase = single
-step4:Read units
+step7:Calculate Final Total:
+a.Total = Energy_Charge + Fixed_Charge+Duty+Surcharge+Meter_Rent
+b.Round the Total to the nearest whole number
 
-step5:Determine fixed charge
-
-a.if phase=single,asign fixed charge according to unit range
-b.else(three phase),assign fixed charge using three phase slab
-
-step6:bill type
-
-a.if unit<=250,type=telescopic
-b.else,type=non-telescopic
-
-step7:if telescopic 
-
-a.apply slabs of 50units one by one
-b.multiply slab units*respective rate
-
-step 8:else
-
-a.select rate based on unit range
-b.charge=units*rate
-
-step9:total=fixed_charge+charge
-
-step10:print the bill
-
-step11: STOP
+step 8:Print Bill
+step9: Stop
